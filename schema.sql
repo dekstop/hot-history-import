@@ -343,7 +343,12 @@ CREATE VIEW etl_view_user_hmp_session_changeset AS
   ORDER BY uid, hot_project, first_date;
 
 DROP TABLE IF EXISTS user_hmp_session_changeset CASCADE;
-CREATE TABLE user_hmp_session_changeset AS SELECT * FROM etl_view_user_hmp_session_changeset;
+CREATE TABLE user_hmp_session_changeset (
+    uid         INTEGER NOT NULL,
+    hot_project INTEGER NOT NULL,
+    session     BIGINT NOT NULL,
+    changeset   INTEGER NOT NULL
+);
 
 DROP VIEW IF EXISTS etl_view_user_hmp_session_size;
 CREATE VIEW etl_view_user_hmp_session_size AS
