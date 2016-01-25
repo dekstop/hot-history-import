@@ -47,6 +47,11 @@ $ createdb $DB
 $ psql -d $DB -c "CREATE EXTENSION postgis;"
 $ psql -d $DB -c "GRANT CREATE ON DATABASE \"${DB}\" TO osm;"
 
+Edit import.sh to reflect the database name.
+
+And then:
+$ ./import.sh
+
 The importer script assumes that the "osm" user can run psql commands from the shell without a password prompt. There are various ways of setting this up without leaving the database exposed. The simplest option is the use of a ~/.pgpass file.
 
 ---
