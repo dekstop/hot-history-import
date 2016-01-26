@@ -225,16 +225,6 @@ ${DB_CMD} -c 'SET temp_buffers = "200MB";
 INSERT INTO changeset SELECT * FROM etl_view_changeset;
 SET temp_buffers = "8MB";' || exit 1
 
-# Editor use per changeset
-
-${DB_CMD} -c "INSERT INTO changeset_editor
-  SELECT c.changeset,
-    coalesce(substring(value, '(iD|JOSM|Potlatch).*'), 'Other') as editor,
-    value as editor_full
-  FROM changeset c
-  LEFT OUTER JOIN changeset_meta_tags t ON (c.changeset=t.changeset AND t.key='created_by');" || exit 1
-# coalesce(substring(value, '(iD|JOSM|Potlatch|Merkaartor|rosemary|Vespucci|OsmAnd|Go Map!!|Pushpin|wheelmap).*'), 'Other') as editor,
-
 # The final join
 
 ${DB_CMD} -c 'SET temp_buffers = "200MB";
@@ -253,6 +243,17 @@ time easy ${PYTHON} ${CHANGESETS_PARSER_DIR}/changeset_tags.py \
 
 time ${DB_CMD} -c "\copy changeset_meta FROM '${ETL_DIR}/changeset_meta.tsv' NULL AS '' csv delimiter '	' header" || exit 1
 time ${DB_CMD} -c "\copy changeset_meta_tags FROM '${ETL_DIR}/changeset_meta_tags.tsv' NULL AS '' csv delimiter '	' header" || exit 1
+
+# Editor use per changeset
+
+${DB_CMD} -c "INSERT INTO changeset_editor
+  SELECT c.changeset,
+    coalesce(substring(value, '(iD|JOSM|Potlatch).*'), 'Other') as editor,
+    value as editor_full
+  FROM changeset c
+  LEFT OUTER JOIN changeset_meta_tags t ON (c.changeset=t.changeset AND t.key='created_by');" || exit 1
+# coalesce(substring(value, '(iD|JOSM|Potlatch|Merkaartor|rosemary|Vespucci|OsmAnd|Go Map!!|Pushpin|wheelmap).*'), 'Other') as editor,
+
 
 #################
 # Edit sessions #
