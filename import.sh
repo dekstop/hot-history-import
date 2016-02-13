@@ -246,14 +246,8 @@ time ${DB_CMD} -c "\copy changeset_meta_tags FROM '${ETL_DIR}/changeset_meta_tag
 
 # Editor use per changeset
 
-${DB_CMD} -c "INSERT INTO changeset_editor
-  SELECT c.changeset,
-    coalesce(substring(value, '(iD|JOSM|Potlatch).*'), 'Other') as editor,
-    value as editor_full
-  FROM changeset c
-  LEFT OUTER JOIN changeset_meta_tags t ON (c.changeset=t.changeset AND t.key='created_by');" || exit 1
-# coalesce(substring(value, '(iD|JOSM|Potlatch|Merkaartor|rosemary|Vespucci|OsmAnd|Go Map!!|Pushpin|wheelmap).*'), 'Other') as editor,
-
+${DB_CMD} -c "INSERT INTO changeset_editor SELECT * FROM etl_view_changeset_editor;" || exit 1
+${DB_CMD} -c "INSERT INTO changeset_comment SELECT * FROM etl_view_changeset_comment;" || exit 1
 
 #################
 # Edit sessions #
