@@ -245,8 +245,9 @@ time ${DB_CMD} -c "\copy changeset_meta FROM '${ETL_DIR}/changeset_meta.tsv' NUL
 time ${DB_CMD} -c "\copy changeset_meta_tags FROM '${ETL_DIR}/changeset_meta_tags.tsv' NULL AS '' csv delimiter '	' header" || exit 1
 
 # Editor use per changeset
-
 ${DB_CMD} -c "INSERT INTO changeset_editor SELECT * FROM etl_view_changeset_editor;" || exit 1
+
+# Changeset comment tags
 ${DB_CMD} -c "INSERT INTO changeset_comment SELECT * FROM etl_view_changeset_comment;" || exit 1
 
 #################
@@ -276,6 +277,18 @@ CREATE TABLE user_prior_experience AS
     count(distinct TO_CHAR(c.first_date - u.tz_offset, 'YYYY-MM-DD')) num_days_with_edits
   FROM user_first_hot_contribution u
   LEFT OUTER JOIN changeset c ON (c.uid=u.uid AND c.last_date<u.start_of_day)
+  GROUP BY u.uid;" || exit 1
+
+${DB_CMD} -c "DROP TABLE IF EXISTS user_hot_contributions;
+CREATE TABLE user_hot_contributions AS
+  SELECT u.uid, 
+    min(first_date) first_date, max(last_date) last_date,
+    count(distinct TO_CHAR(s.first_date - u.tz_offset, 'YYYY-MM-DD')) num_days_with_edits,
+    count(distinct s.hot_project) num_projects, 
+    sum(labour_hours) labour_hours,
+    sum(num_edits) num_edits
+  FROM user_first_hot_contribution u
+  JOIN user_hmp_session s ON (s.uid=u.uid)
   GROUP BY u.uid;" || exit 1
 
 

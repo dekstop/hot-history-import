@@ -243,7 +243,7 @@ CREATE TABLE changeset_comment (
   comment     TEXT NOT NULL
 );
 
-CREATE INDEX idx_changeset_comment_lower_comment ON changeset_comment(lower(comment));
+-- CREATE INDEX idx_changeset_comment_lower_comment ON changeset_comment(lower(comment));
 
 DROP VIEW IF EXISTS etl_view_changeset_comment CASCADE;
 CREATE VIEW etl_view_changeset_comment AS
