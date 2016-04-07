@@ -221,36 +221,6 @@ CREATE VIEW etl_view_changeset AS
   FULL OUTER JOIN etl_view_changeset_summary_way_edits w ON (n.changeset=w.changeset)
   FULL OUTER JOIN etl_view_changeset_summary_rel_edits r ON (COALESCE(n.changeset, w.changeset)=r.changeset);
 
-DROP TABLE IF EXISTS changeset_editor;
-CREATE TABLE changeset_editor (
-  changeset   INTEGER NOT NULL,
-  editor      TEXT NOT NULL,
-  editor_full TEXT
-);
-
-DROP VIEW IF EXISTS etl_view_changeset_editor CASCADE;
-CREATE VIEW etl_view_changeset_editor AS
-  SELECT c.changeset,
-    coalesce(substring(value, '(iD|JOSM|Potlatch).*'), 'Other') as editor,
-    value as editor_full
-  FROM changeset c
-  LEFT OUTER JOIN changeset_meta_tags t ON (c.changeset=t.changeset AND t.key='created_by');
--- coalesce(substring(value, '(iD|JOSM|Potlatch|Merkaartor|rosemary|Vespucci|OsmAnd|Go Map!!|Pushpin|wheelmap).*'), 'Other') as editor,
-
-DROP TABLE IF EXISTS changeset_comment;
-CREATE TABLE changeset_comment (
-  changeset   INTEGER NOT NULL,
-  comment     TEXT NOT NULL
-);
-
--- CREATE INDEX idx_changeset_comment_lower_comment ON changeset_comment(lower(comment));
-
-DROP VIEW IF EXISTS etl_view_changeset_comment CASCADE;
-CREATE VIEW etl_view_changeset_comment AS
-  SELECT changeset, value as comment
-  FROM changeset_meta_tags
-  WHERE key='comment' AND value IS NOT NULL AND value!='';
-
 -- Tools
 
 CREATE OR REPLACE FUNCTION bbox_geog_area(
@@ -330,6 +300,40 @@ CREATE TABLE changeset_meta_tags (
 );
 
 CREATE INDEX idx_changeset_meta_tags_key ON changeset_meta_tags(key);
+
+--
+-- Derived from changeset tags
+--
+
+DROP TABLE IF EXISTS changeset_editor;
+CREATE TABLE changeset_editor (
+  changeset   INTEGER NOT NULL,
+  editor      TEXT NOT NULL,
+  editor_full TEXT
+);
+
+DROP VIEW IF EXISTS etl_view_changeset_editor CASCADE;
+CREATE VIEW etl_view_changeset_editor AS
+  SELECT c.changeset,
+    coalesce(substring(value, '(iD|JOSM|Potlatch).*'), 'Other') as editor,
+    value as editor_full
+  FROM changeset c
+  LEFT OUTER JOIN changeset_meta_tags t ON (c.changeset=t.changeset AND t.key='created_by');
+-- coalesce(substring(value, '(iD|JOSM|Potlatch|Merkaartor|rosemary|Vespucci|OsmAnd|Go Map!!|Pushpin|wheelmap).*'), 'Other') as editor,
+
+DROP TABLE IF EXISTS changeset_comment;
+CREATE TABLE changeset_comment (
+  changeset   INTEGER NOT NULL,
+  comment     TEXT NOT NULL
+);
+
+-- CREATE INDEX idx_changeset_comment_lower_comment ON changeset_comment(lower(comment));
+
+DROP VIEW IF EXISTS etl_view_changeset_comment CASCADE;
+CREATE VIEW etl_view_changeset_comment AS
+  SELECT changeset, value as comment
+  FROM changeset_meta_tags
+  WHERE key='comment' AND value IS NOT NULL AND value!='';
 
 --
 -- Edit sessions
