@@ -133,6 +133,30 @@ CREATE TABLE rel_edits (
   uid         INTEGER
 );
 
+DROP TABLE IF EXISTS node_tag_edits CASCADE;
+CREATE TABLE node_tag_edits (
+  id          BIGINT NOT NULL,
+  version     INTEGER NOT NULL,
+  key         TEXT,
+  value       TEXT
+);
+
+DROP TABLE IF EXISTS way_tag_edits CASCADE;
+CREATE TABLE way_tag_edits (
+  id          BIGINT NOT NULL,
+  version     INTEGER NOT NULL,
+  key         TEXT,
+  value       TEXT
+);
+
+DROP TABLE IF EXISTS rel_tag_edits CASCADE;
+CREATE TABLE rel_tag_edits (
+  id          BIGINT NOT NULL,
+  version     INTEGER NOT NULL,
+  key         TEXT,
+  value       TEXT
+);
+
 -- 
 -- PostGIS geojoin
 --

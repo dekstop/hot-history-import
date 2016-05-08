@@ -8,10 +8,10 @@ SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 
 # HOT TM2
 # http://tasks.hotosm.org/?direction=desc&sort_by=created
-MAX_PROJECT=1428
+MAX_PROJECT=1900
 
 # Database
-DB_NAME=hotosm_history_20160113
+DB_NAME=hotosm_history_20160505
 DB_CMD="psql --set ON_ERROR_STOP=1 -U osm -h localhost ${DB_NAME}"
 
 # Scripts and programs
@@ -193,8 +193,14 @@ time easy ${HISTORY_PARSER_DIR}/user-edit-history \
   ${ETL_DIR}/way_edits.txt \
   ${ETL_DIR}/rel_edits.txt || exit 1
 
-ls -lh ${ETL_DIR}
+time easy ${HISTORY_PARSER_DIR}/user-tag-edit-history \
+  ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
+  ${ETL_DIR}/hot-userids.txt \
+  ${ETL_DIR}/node_tag_edits.txt \
+  ${ETL_DIR}/way_tag_edits.txt \
+  ${ETL_DIR}/rel_tag_edits.txt || exit 1
 
+ls -lh ${ETL_DIR}
 
 ################
 # Load history #
@@ -211,6 +217,18 @@ time ${DB_CMD} -c "VACUUM ANALYZE way_edits" || exit 1
 time pv ${ETL_DIR}/rel_edits.txt | ${DB_CMD} -c "COPY rel_edits FROM STDIN NULL AS ''" || exit 1
 time ${DB_CMD} -c "VACUUM ANALYZE rel_edits" || exit 1
 # select count(*) from rel_edits;
+
+time pv ${ETL_DIR}/node_tag_edits.txt | ${DB_CMD} -c "COPY node_tag_edits FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE node_tag_edits" || exit 1
+# select count(*) from node_tag_edits;
+
+time pv ${ETL_DIR}/way_tag_edits.txt | ${DB_CMD} -c "COPY way_tag_edits FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE way_tag_edits" || exit 1
+# select count(*) from way_tag_edits;
+
+time pv ${ETL_DIR}/rel_tag_edits.txt | ${DB_CMD} -c "COPY rel_tag_edits FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE rel_tag_edits" || exit 1
+# select count(*) from rel_tag_edits;
 
 # TODO: compress or delete the raw data files
 
