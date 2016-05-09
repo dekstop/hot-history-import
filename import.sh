@@ -13,12 +13,14 @@ MAX_PROJECT=1900
 # Database
 DB_NAME=hotosm_history_20160505
 DB_CMD="psql --set ON_ERROR_STOP=1 -U osm -h localhost ${DB_NAME}"
+${DB_CMD} -c "SELECT 1" || exit 1
 
 # Scripts and programs
 SCRAPER_APP_DIR=~/osm/src/hot-tm2-scraper
 HISTORY_PARSER_DIR=~/osm/src/osm-history-parser/build
 CHANGESETS_PARSER_DIR=~/osm/src/osm-changeset-parser
 PYTHON=~/osm/ipython-env/env/bin/python
+WGET_CMD="wget --progress=dot:giga"
 
 # Data sources
 HISTORY_DUMP_URL=http://planet.osm.org/pbf/full-history/history-latest.osm.pbf
@@ -103,11 +105,11 @@ ${DB_CMD} < ${SCRIPT_DIR}/schema.sql || exit 1
 ###############
 
 pushd ${HISTORY_DUMP_DIR}
-wget ${HISTORY_DUMP_URL} || exit 1
+${WGET_CMD} ${HISTORY_DUMP_URL} || exit 1
 popd
 
 pushd ${CHANGESETS_DUMP_DIR}
-wget ${CHANGESETS_DUMP_URL} || exit 1
+${WGET_CMD} ${CHANGESETS_DUMP_URL} || exit 1
 bzip2 -d ${CHANGESETS_DUMP_FILE_COMPRESSED} || exit 1
 popd
 
@@ -193,6 +195,13 @@ time easy ${HISTORY_PARSER_DIR}/user-edit-history \
   ${ETL_DIR}/way_edits.txt \
   ${ETL_DIR}/rel_edits.txt || exit 1
 
+time easy ${HISTORY_PARSER_DIR}/user-deletion-history \
+  ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
+  ${ETL_DIR}/hot-userids.txt \
+  ${ETL_DIR}/node_deletions.txt \
+  ${ETL_DIR}/way_deletions.txt \
+  ${ETL_DIR}/rel_deletions.txt || exit 1
+
 time easy ${HISTORY_PARSER_DIR}/user-tag-edit-history \
   ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
   ${ETL_DIR}/hot-userids.txt \
@@ -229,6 +238,18 @@ time ${DB_CMD} -c "VACUUM ANALYZE way_tag_edits" || exit 1
 time pv ${ETL_DIR}/rel_tag_edits.txt | ${DB_CMD} -c "COPY rel_tag_edits FROM STDIN NULL AS ''" || exit 1
 time ${DB_CMD} -c "VACUUM ANALYZE rel_tag_edits" || exit 1
 # select count(*) from rel_tag_edits;
+
+time pv ${ETL_DIR}/node_deletions.txt | ${DB_CMD} -c "COPY node_deletions FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE node_deletions" || exit 1
+# select count(*) from node_deletions;
+
+time pv ${ETL_DIR}/way_deletions.txt | ${DB_CMD} -c "COPY way_deletions FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE way_deletions" || exit 1
+# select count(*) from way_deletions;
+
+time pv ${ETL_DIR}/rel_deletions.txt | ${DB_CMD} -c "COPY rel_deletions FROM STDIN NULL AS ''" || exit 1
+time ${DB_CMD} -c "VACUUM ANALYZE rel_deletions" || exit 1
+# select count(*) from rel_deletions;
 
 # TODO: compress or delete the raw data files
 
