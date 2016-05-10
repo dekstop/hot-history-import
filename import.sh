@@ -260,13 +260,13 @@ time ${DB_CMD} -c "VACUUM ANALYZE rel_deletions" || exit 1
 
 # Changeset aggregation
 
-${DB_CMD} -c 'SET temp_buffers = "200MB"; 
+time ${DB_CMD} -c 'SET temp_buffers = "200MB"; 
 INSERT INTO changeset SELECT * FROM etl_view_changeset;
 SET temp_buffers = "8MB";' || exit 1
 
 # The final join
 
-${DB_CMD} -c 'SET temp_buffers = "200MB";
+time ${DB_CMD} -c 'SET temp_buffers = "200MB";
 INSERT INTO changeset_hot_project SELECT * FROM etl_view_changeset_hot_project;
 SET temp_buffers = "8MB";' || exit 1
 
