@@ -112,7 +112,8 @@ CREATE TABLE node_edits (
   timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   uid         INTEGER,
   latitude    NUMERIC,
-  longitude   NUMERIC
+  longitude   NUMERIC,
+  visible     BOOL NOT NULL
 );
 
 DROP TABLE IF EXISTS way_edits CASCADE;
@@ -121,7 +122,8 @@ CREATE TABLE way_edits (
   version     INTEGER NOT NULL,
   changeset   INTEGER NOT NULL,
   timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  uid         INTEGER
+  uid         INTEGER,
+  visible     BOOL NOT NULL
 );
 
 DROP TABLE IF EXISTS rel_edits CASCADE;
@@ -130,7 +132,8 @@ CREATE TABLE rel_edits (
   version     INTEGER NOT NULL,
   changeset   INTEGER NOT NULL,
   timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  uid         INTEGER
+  uid         INTEGER,
+  visible     BOOL NOT NULL
 );
 
 DROP TABLE IF EXISTS node_tag_edits CASCADE;
