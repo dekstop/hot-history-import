@@ -166,14 +166,18 @@ CREATE TABLE rel_tag_edits (
   value       TEXT
 );
 
-DROP TABLE IF EXISTS node_deletions CASCADE;
-CREATE TABLE node_deletions (
-  id          BIGINT NOT NULL,
-  version     INTEGER NOT NULL,
-  changeset   INTEGER NOT NULL,
-  timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  uid         INTEGER
-);
+--
+-- Object deletions
+--
+
+-- DROP TABLE IF EXISTS node_deletions CASCADE;
+-- CREATE TABLE node_deletions (
+--   id          BIGINT NOT NULL,
+--   version     INTEGER NOT NULL,
+--   changeset   INTEGER NOT NULL,
+--   timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+--   uid         INTEGER
+-- );
 
 DROP TABLE IF EXISTS way_deletions CASCADE;
 CREATE TABLE way_deletions (
@@ -184,14 +188,14 @@ CREATE TABLE way_deletions (
   uid         INTEGER
 );
 
-DROP TABLE IF EXISTS rel_deletions CASCADE;
-CREATE TABLE rel_deletions (
-  id          BIGINT NOT NULL,
-  version     INTEGER NOT NULL,
-  changeset   INTEGER NOT NULL,
-  timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  uid         INTEGER
-);
+-- DROP TABLE IF EXISTS rel_deletions CASCADE;
+-- CREATE TABLE rel_deletions (
+--   id          BIGINT NOT NULL,
+--   version     INTEGER NOT NULL,
+--   changeset   INTEGER NOT NULL,
+--   timestamp   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+--   uid         INTEGER
+-- );
 
 
 -- 

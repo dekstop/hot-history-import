@@ -195,13 +195,6 @@ time easy ${HISTORY_PARSER_DIR}/user-edit-history \
   ${ETL_DIR}/way_edits.txt \
   ${ETL_DIR}/rel_edits.txt || exit 1
 
-time easy ${HISTORY_PARSER_DIR}/user-deletion-history \
-  ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
-  ${ETL_DIR}/hot-userids.txt \
-  ${ETL_DIR}/node_deletions.txt \
-  ${ETL_DIR}/way_deletions.txt \
-  ${ETL_DIR}/rel_deletions.txt || exit 1
-
 time easy ${HISTORY_PARSER_DIR}/user-tag-edit-history \
   ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
   ${ETL_DIR}/hot-userids.txt \
@@ -239,20 +232,24 @@ time pv ${ETL_DIR}/rel_tag_edits.txt | ${DB_CMD} -c "COPY rel_tag_edits FROM STD
 time ${DB_CMD} -c "VACUUM ANALYZE rel_tag_edits" || exit 1
 # select count(*) from rel_tag_edits;
 
-time pv ${ETL_DIR}/node_deletions.txt | ${DB_CMD} -c "COPY node_deletions FROM STDIN NULL AS ''" || exit 1
-time ${DB_CMD} -c "VACUUM ANALYZE node_deletions" || exit 1
-# select count(*) from node_deletions;
+# TODO: compress or delete the raw data files
+
+####################
+# Deletion history #
+####################
+
+# Extract object list
+
+${DB_CMD} -c "\copy (SELECT DISTINCT id FROM way_edits) TO '${ETL_DIR}/way-ids.txt' CSV" || exit 1
+
+time easy ${HISTORY_PARSER_DIR}/way-deletion-history \
+  ${HISTORY_DUMP_DIR}/history-latest.osm.pbf \
+  ${ETL_DIR}/way-ids.txt \
+  ${ETL_DIR}/way_deletions.txt || exit 1
 
 time pv ${ETL_DIR}/way_deletions.txt | ${DB_CMD} -c "COPY way_deletions FROM STDIN NULL AS ''" || exit 1
 time ${DB_CMD} -c "VACUUM ANALYZE way_deletions" || exit 1
 # select count(*) from way_deletions;
-
-time pv ${ETL_DIR}/rel_deletions.txt | ${DB_CMD} -c "COPY rel_deletions FROM STDIN NULL AS ''" || exit 1
-time ${DB_CMD} -c "VACUUM ANALYZE rel_deletions" || exit 1
-# select count(*) from rel_deletions;
-
-# TODO: compress or delete the raw data files
-
 
 ###################
 # PostGIS geojoin #
