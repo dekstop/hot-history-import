@@ -335,6 +335,7 @@ CREATE VIEW etl_view_changeset_hot_project AS
   JOIN hot_project_activity a ON (a.hot_project=r.hot_project)
   JOIN hot_project_description d ON (d.hot_project=r.hot_project)
   JOIN changeset c ON (
+    ST_IsValid(geom) AND
     ST_Contains(get_world_bbox(), geom) AND           -- project area is within world bounds
     (d.is_private=FALSE AND d.is_draft=FALSE)) AND        -- project is publicly visible (may be archived)
     c.min_lat IS NOT NULL AND                             -- changeset has known coordinates
