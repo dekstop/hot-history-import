@@ -1,10 +1,11 @@
 
-Scripts to import HOT TM2 edit histories into a Postgres database.
-By Martin Dittus (@dekstop) in 2014/2015.
+Scripts to import an aggregated projection of HOT TM2 edit histories into a Postgres database.
+By Martin Dittus (@dekstop) in 2014-2017, used as a starting point for my research projects.
 
 DISCLAIMER
 
 Please only run these after careful study of what they're doing.
+Parts of the process require significant disk/cpu resources.
 No need to create more problems for overworked server admins.
 
 --
@@ -23,7 +24,7 @@ These require:
 - A Python 2.x environment with GDAL and lxml.
 - PostgreSQL 9.4 with PostGIS 2.1 (approx).
 
-It can take some time to set these up... prepare yourself for lots of version conflicts and badly documented release issues. Geo processing software is still a pain to use in 2015.
+It can take some time to set these up... prepare yourself for lots of version conflicts and badly documented release issues. Geo processing software is still a pain to use in 2017.
 
 ---
 
@@ -31,7 +32,7 @@ SYSTEM REQUIREMENTS
 
 The bandwidth to download ~70GB in OSM history files.
 
-Lots of disk space -- in late 2015 it takes about 150GB in temp files (can be deleted after import), and 80GB for the database (can be reduced after import, depending on your needs).
+Lots of disk space -- in late 2015 it took about 150GB in temp files (can be deleted after import), and 80GB for the database (can be reduced after import, depending on your needs). By early 2017, this has grown to 250GB temp storage, and 180GB for the DB.
 
 It then takes about a day for the full import. Key performance bottlenecks are disk scans/seeks, although CPU can be a bottleneck during the initial parsing stages.
 
@@ -41,13 +42,13 @@ CREATING A DATABASE
 
 Run as privileged postgres user. 
 
-$ DB=hotosm_history_20151126
+$ DB=hotosm_history_20170306
 $ createuser osm --pwprompt
 $ createdb $DB
 $ psql -d $DB -c "CREATE EXTENSION postgis;"
 $ psql -d $DB -c "GRANT CREATE ON DATABASE \"${DB}\" TO osm;"
 
-Edit import.sh to reflect the database name.
+Edit import.sh to reflect the chosen database name.
 
 And then:
 $ ./import.sh
