@@ -8,10 +8,10 @@ SCRIPT_DIR=$( cd "$( dirname "$0" )" && pwd )
 
 # HOT TM2
 # http://tasks.hotosm.org/?direction=desc&sort_by=created
-MAX_PROJECT=2020
+MAX_PROJECT=2631
 
 # Database
-DB_NAME=hotosm_history_20160704
+DB_NAME=hotosm_history_20170306
 DB_CMD="psql --set ON_ERROR_STOP=1 -U osm -h localhost ${DB_NAME}"
 ${DB_CMD} -c "SELECT 1" || exit 1
 
